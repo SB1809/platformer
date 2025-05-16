@@ -193,8 +193,8 @@ public class Level {
 	}
 	
 	
-	//Precondition: the 
-	//Postcondition:
+	//Precondition: the map isn't a null value and fullness is between 0 and 3.
+	//Postcondition: will make the water when hiting the flower.
 	private void water(int col, int row, Map map, int fullness) {
 
 		Water w = new Water (col, row, tileSize, tileset.getImage("Full_water"), this, fullness);
