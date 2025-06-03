@@ -30,6 +30,7 @@ public class Camera {
 	private float borderLeft;
 	private float borderRight;
 	private float borderBot;
+	public boolean didITouchGas;
 	
 	private Vector2D goalPosition;
 	
@@ -96,8 +97,14 @@ public class Camera {
 	}
 	
 	public boolean isVisibleOnCamera(float x, float y, int width, int height) {
-		if(x + width > position.x && x < position.x + this.width && y + height > position.y && y < position.y + this.height) return true;
-		return false;
+		if (didITouchGas == false){
+			if(x + width > position.x && x < position.x + this.width && y + height > position.y && y < position.y + this.height) return true;
+			return false;
+		}
+		else{
+			if(x + width > position.x+350 && x < position.x-350 + this.width && y + height > position.y+120 && y < position.y-120 + this.height) return true;
+			return false;
+		}
 	}
 	
 	//--------------------------------Getters
