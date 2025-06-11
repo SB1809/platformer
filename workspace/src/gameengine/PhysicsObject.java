@@ -19,6 +19,8 @@ public class PhysicsObject extends GameObject{
 	protected Tile[] collisionMatrix;
 	protected Tile[] closestMatrix;
 
+	public boolean flying = false;
+
 	private Level level;
 	
 	public PhysicsObject(float x, float y, int width, int height, Level level) {
@@ -32,7 +34,10 @@ public class PhysicsObject extends GameObject{
 
 	@Override
 	public void update(float tslf) {
-		movementVector.y += (Level.GRAVITY * Level.GRAVITY) * tslf;
+		if(flying == false){
+			movementVector.y += (Level.GRAVITY * Level.GRAVITY) * tslf;
+		}
+
 
 		updateCollisionMatrix(tslf); // checking collision based on the new position -> current movement Vector
 
@@ -63,6 +68,7 @@ public class PhysicsObject extends GameObject{
 		position.y += movementVector.y * tslf;
 		
 		hitbox.update(); // -> saving old position
+		
 	}
 
 	public void updateCollisionMatrix(float tslf) {

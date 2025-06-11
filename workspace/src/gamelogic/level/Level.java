@@ -4,10 +4,11 @@ import java.awt.Graphics;
 import java.util.ArrayList;
 import java.util.List;
 
-import gameengine.PhysicsObject;
+import gameengine.*;
 import gameengine.graphics.Camera;
 import gameengine.loaders.Mapdata;
 import gameengine.loaders.Tileset;
+import gameengine.powerups.Wings;
 import gamelogic.GameResources;
 import gamelogic.Main;
 import gamelogic.enemies.Enemy;
@@ -20,7 +21,7 @@ import gamelogic.tiles.SolidTile;
 import gamelogic.tiles.Spikes;
 import gamelogic.tiles.Tile;
 import gamelogic.tiles.Water;
-
+import gameengine.powerups.Wings;
 public class Level {
 
 	private LevelData leveldata;
@@ -34,6 +35,7 @@ public class Level {
 	private boolean playerWin;
 
 	private ArrayList<Enemy> enemiesList = new ArrayList<>();
+	private ArrayList<Wings> wingsList = new ArrayList<>();
 	private ArrayList<Flower> flowers = new ArrayList<>();
 	private ArrayList<Water> waters = new ArrayList<>();
 	private ArrayList<Gas> gases = new ArrayList<>();
@@ -66,6 +68,7 @@ public class Level {
 		Tile[][] tiles = new Tile[width][height];
 		waters = new ArrayList();
 		gases = new ArrayList();
+		wingsList = new ArrayList<>();
 
 		for (int x = 0; x < width; x++) {
 			int xPosition = x;
@@ -127,6 +130,10 @@ public class Level {
 				else if (values[x][y] == 21){
 					tiles[x][y] = new Water(xPosition, yPosition, tileSize, tileset.getImage("Quarter_water"), this, 1);
 					waters.add((Water)tiles[x][y]);}
+				else if (values[x][y] == 22)
+					wingsList.add(new Wings(xPosition * tileSize, yPosition * tileSize, tileSize, tileSize, this));
+
+
 			}
 
 		}
@@ -136,6 +143,8 @@ public class Level {
 		for (int i = 0; i < enemiesList.size(); i++) {
 			enemies[i] = new Enemy(enemiesList.get(i).getX(), enemiesList.get(i).getY(), this);
 		}
+
+
 		player = new Player(leveldata.getPlayerX() * map.getTileSize(), leveldata.getPlayerY() * map.getTileSize(),
 				this);
 		camera.setFocusedObject(player);
@@ -188,29 +197,32 @@ public class Level {
 			boolean didITouchWater = false;
 			for(Water w: waters){
 				if (w.getHitbox().isIntersecting(player.getHitbox())){
-					System.out.println("touching water");
 					didITouchWater = true;
 					player.walkSpeed = 100;
 				}
 			}
 			if(!didITouchWater){
-					System.out.println("am not water");
 					player.walkSpeed = 500;
 			}
 
 			boolean didITouchGas = false;
 			for(Gas g: gases){
 				if (g.getHitbox().isIntersecting(player.getHitbox())){
-					System.out.println("touching gas");
 					didITouchGas = true;
 				}
 			}
-			if(!didITouchGas){
-					System.out.println("am not gas");
-					
-			}
 			camera.didITouchGas = didITouchGas;
-			
+
+			boolean didITouchWing = false;
+			for(Wings f: wingsList){
+				if (f.getHitbox().isIntersecting(player.getHitbox())){
+					System.out.println("touching wing");
+					didITouchWing = true;
+					player.flying = true;
+					player.time = System.currentTimeMillis();
+				}
+			}
+
 
 			// Update the enemies
 			for (int i = 0; i < enemies.length; i++) {
@@ -227,6 +239,7 @@ public class Level {
 			camera.update(tslf);
 		}
 	}
+
 
 
 	// Precondition: map and placedThisRound is not null and you cant impunt a number grater than what is possible.
@@ -406,6 +419,12 @@ public class Level {
 		for (int i = 0; i < enemies.length; i++) {
 			enemies[i].draw(g);
 		}
+
+		// Draw the wings
+		for (int i = 0; i < wingsList.size(); i++) {
+			wingsList.get(i).draw(g);
+		}
+
 
 		// Draw the player
 		player.draw(g);

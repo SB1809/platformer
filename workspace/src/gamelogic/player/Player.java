@@ -13,17 +13,21 @@ import gamelogic.tiles.Tile;
 
 public class Player extends PhysicsObject{
 	public float walkSpeed = 500;
-	public float jumpPower = 1800;
-
+	public float jumpPower = 1700;
+	public float fly = 5;
+	
 	private boolean isJumping = false;
-	private long time;
+	public long time;
+
+	public static final long FLY_TIME= 5000;
+
 
 	public Player(float x, float y, Level level) {
 	
 		super(x, y, level.getLevelData().getTileSize(), level.getLevelData().getTileSize(), level);
 		int offset =(int)(level.getLevelData().getTileSize()*0.1); //hitbox is offset by 10% of the player size.
 		this.hitbox = new RectHitbox(this, offset,offset, width -offset, height - offset);
-		time = System.currentTimeMillis();
+		time = 0;
 	}
 
 	@Override
@@ -40,6 +44,10 @@ public class Player extends PhysicsObject{
 		if(PlayerInput.isJumpKeyDown() && !isJumping) {
 			movementVector.y = -jumpPower;
 			isJumping = true;
+
+		}
+		if(PlayerInput.isFlyKeyDown() && flying) {
+			position.y -= fly;
 		}
 		
 		isJumping = true;
@@ -51,10 +59,13 @@ public class Player extends PhysicsObject{
 		g.setColor(Color.YELLOW);
 		MyGraphics.fillRectWithOutline(g, (int)getX(), (int)getY(), width, height);
 
-		g.setFont(new Font("Comic Sans MS",Font.PLAIN, 40));
-		g.drawString((System.currentTimeMillis()-time)/1000+"", (int)getX(), (int)getY());
-		if(System.currentTimeMillis()-time > 5000){
-			time = System.currentTimeMillis();
+		if(flying){
+			g.setFont(new Font("Comic Sans MS",Font.PLAIN, 20));
+			g.drawString((FLY_TIME-(System.currentTimeMillis()-time))/1000+"", (int)getX(), (int)getY());
+			if(System.currentTimeMillis()-time > FLY_TIME){
+			 	time = 0;
+			 	flying = false;
+			}
 		}
 		
 		if(Main.DEBUGGING) {
